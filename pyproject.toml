@@ -29,7 +29,7 @@ build-backend = "hatchling.build"
 packages = ["src/crypto_mcp"]
 
 [tool.ruff]
-line-length = 88
+line-length = 100
 src = ["src"]
 
 [tool.ruff.lint]

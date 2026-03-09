@@ -5,48 +5,33 @@ from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
-from crypto_mcp.clients.coingecko import CoinGeckoClient
-from crypto_mcp.config import settings
+from crypto_mcp.tools.markets import run as market_run
+from crypto_mcp.tools.markets import tool_definition as market_definition
+from crypto_mcp.tools.price import run as price_run
+from crypto_mcp.tools.price import tool_definition as price_definition
+from crypto_mcp.tools.trending import run as trending_run
+from crypto_mcp.tools.trending import tool_definition as trending_definition
 
 # Instantiate server
 app = Server("crypto-mcp")
 
+tool_definitions = [price_definition, trending_definition, market_definition]
+
+tool_runners = {
+    "get_price": price_run,
+    "get_trending": trending_run,
+    "get_market_overview": market_run,
+}
 # List tools handler
 @app.list_tools()
 async def list_tools() -> list[Tool]:
-    return [
-        Tool(
-            name="get_price",
-            description=(
-                "Get the current price of a cryptocurrency "
-                "by its CoinGecko ID (e.g. 'bitcoin', 'ethereum'). "
-                "Returns price and 24h change."
-            ),
-            inputSchema={
-                "type": "object",
-                "properties":{
-                    "coin_id":{"type":"string"},
-                    "currency":{"type":"string", "default": "usd"},
-                },
-                "required":["coin_id"]
-            })
-    ]
+    return tool_definitions
 
 @app.call_tool()
-async def tool_call(name: str, arguments: dict) -> list[TextContent]:
-    try:
-        if name == "get_price":
-            coin_id = arguments.get("coin_id")
-            if not coin_id:
-                raise ValueError("coin_id is required")
-            currency = arguments.get("currency", "usd")
-            async with CoinGeckoClient() as client:
-                price = await client.get_price(coin_id, currency)
-                change = f"{round(price.change_24h, 2)}%" if price.change_24h is not None else "N/A"
-                answer = f"{coin_id.capitalize()} is {price.price} {currency.upper()}\n24h change: {change}"
-        return [TextContent(type="text", text=answer)]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
+async def call_tool(name: str, arguments: dict) -> list[TextContent]:
+    if name not in tool_runners:
+        raise ValueError(f"Tool not found: {name}")
+    return await tool_runners[name](arguments)
     
 async def main():
     async with stdio_server() as (read_stream, write_stream):
