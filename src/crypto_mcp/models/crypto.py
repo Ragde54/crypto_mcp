@@ -60,7 +60,7 @@ class CoinMarket(BaseModel):
     name: str
     symbol: str
     current_price: float
-    market_cap: float | None
+    market_cap: int | None
     change_24h: float | None
     
     @classmethod
@@ -75,11 +75,12 @@ class CoinMarket(BaseModel):
     )
 
     def to_text(self) -> str:
-        change = f"{round(self.change_24h, 2)}%" if self.change_24h is not None else "N/A"
+        change = f"{round(self.change_24h, 2)}" if self.change_24h is not None else "N/A"
+        market_cap = f"{self.market_cap:,}" if self.market_cap is not None else "N/A"
         parts = [
             f"{self.name} ({self.symbol.upper()})",
             f"Current price: {self.current_price}",
-            f"Market cap: {self.market_cap}",
+            f"Market cap: {market_cap}",
             f"24h change: {change}",
         ]
         return " | ".join(parts)

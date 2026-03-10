@@ -59,7 +59,7 @@ class CoinGeckoClient:
             if e.response.status_code == 429:
                 raise ValueError("Rate limit exceeded, try again later")
             raise
-        return [TrendingCoin.from_api_response(coin) for coin in data["coins"]]
+        return [TrendingCoin.from_api_response(coin) for coin in data["coins"][:7]]
 
     async def get_market_overview(self, currency: str, top_n: int = 10) -> list[CoinMarket]:
         url = f"{self.settings.coingecko_base_url}/coins/markets"
