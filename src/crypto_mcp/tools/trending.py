@@ -10,12 +10,9 @@ tool_definition = Tool(
         "Get the top 7 trending cryptocurrencies on CoinGecko in the last 24 hours. "
         "Returns coin ID, name, symbol, market cap rank, and 24h price change for each."
     ),
-    inputSchema={
-        "type": "object",
-        "properties": {},
-        "required": []
-    }
+    inputSchema={"type": "object", "properties": {}, "required": []},
 )
+
 
 async def run(arguments: dict) -> list[TextContent]:
     async with CoinGeckoClient() as client:

@@ -14,19 +14,13 @@ tool_definition = Tool(
     inputSchema={
         "type": "object",
         "properties": {
-            "coin_id": {
-                "type": "string",
-                "description": "CoinGecko coin ID e.g. 'bitcoin', 'ethereum'"
-            },
-            "currency": {
-                "type": "string",
-                "description": "Currency code e.g. 'usd', 'eur'",
-                "default": "usd"
-            },
+            "coin_id": {"type": "string", "description": "CoinGecko coin ID e.g. 'bitcoin', 'ethereum'"},
+            "currency": {"type": "string", "description": "Currency code e.g. 'usd', 'eur'", "default": "usd"},
         },
-        "required": ["coin_id"]
-    }
+        "required": ["coin_id"],
+    },
 )
+
 
 async def run(arguments: dict) -> list[TextContent]:
     coin_id = arguments.get("coin_id")

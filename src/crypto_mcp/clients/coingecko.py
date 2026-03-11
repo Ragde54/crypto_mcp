@@ -9,11 +9,11 @@ from crypto_mcp.models.crypto import CoinMarket, CoinPrice, TrendingCoin
 class CoinGeckoClient:
     def __init__(self):
         self.settings = settings
-        
+
     async def __aenter__(self):
         self.client = AsyncClient()
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.client.aclose()
 
@@ -27,7 +27,7 @@ class CoinGeckoClient:
         headers = {
             "x-cg-demo-api-key": self.settings.coingecko_api_key,
         }
-        data={}
+        data = {}
         try:
             response = await self.client.get(url, params=params, headers=headers)
             response.raise_for_status()
@@ -38,17 +38,17 @@ class CoinGeckoClient:
             if e.response.status_code == 429:
                 raise ValueError("Rate limit exceeded, try again later")
             raise
-    
+
         return CoinPrice.from_api_response(
             data=data,
             coin_id=coin_id,
             currency=currency,
         )
-    
+
     async def get_trending(self) -> list[TrendingCoin]:
         url = f"{self.settings.coingecko_base_url}/search/trending"
-        headers={"x-cg-demo-api-key": self.settings.coingecko_api_key}
-        data={}
+        headers = {"x-cg-demo-api-key": self.settings.coingecko_api_key}
+        data = {}
         try:
             response = await self.client.get(url, headers=headers)
             response.raise_for_status()
@@ -61,15 +61,15 @@ class CoinGeckoClient:
             raise
         return [TrendingCoin.from_api_response(coin) for coin in data["coins"][:7]]
 
-    async def get_market_overview(self, currency: str, top_n: int = 10) -> list[CoinMarket]:
+    async def get_market(self, currency: str, top_n: int = 10) -> list[CoinMarket]:
         url = f"{self.settings.coingecko_base_url}/coins/markets"
         params = {
             "vs_currency": currency,
             "order": "market_cap_desc",
             "per_page": top_n,
         }
-        headers={"x-cg-demo-api-key": self.settings.coingecko_api_key}
-        data={} 
+        headers = {"x-cg-demo-api-key": self.settings.coingecko_api_key}
+        data = {}
         try:
             response = await self.client.get(url, params=params, headers=headers)
             response.raise_for_status()

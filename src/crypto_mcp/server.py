@@ -23,17 +23,19 @@ prompt_definitions = [analysis_prompt]
 tool_runners = {
     "get_price": price_run,
     "get_trending": trending_run,
-    "get_market_overview": market_run,
+    "get_market": market_run,
 }
 
 prompt_runners = {
     "analyze-crypto": analysis_get_prompt,
 }
 
+
 # List tools handler
 @app.list_tools()
 async def list_tools() -> list[Tool]:
     return tool_definitions
+
 
 @app.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
@@ -41,9 +43,11 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         raise ValueError(f"Tool not found: {name}")
     return await tool_runners[name](arguments)
 
+
 @app.list_prompts()
 async def list_prompts() -> list[Prompt]:
     return prompt_definitions
+
 
 @app.get_prompt()
 async def get_prompt(name: str, arguments: dict) -> GetPromptResult:
@@ -51,18 +55,22 @@ async def get_prompt(name: str, arguments: dict) -> GetPromptResult:
         raise ValueError(f"Prompt not found: {name}")
     return prompt_runners[name](**arguments)
 
+
 async def main():
     async with stdio_server() as (read_stream, write_stream):
-        await app.run(read_stream,
-                    write_stream, 
-                    InitializationOptions(
-                        server_name="crypto-mcp",
-                        server_version="0.1.0",
-                        capabilities=app.get_capabilities(
-                            notification_options=NotificationOptions(),
-                            experimental_capabilities={},
-                        ),
-                    ))
-        
+        await app.run(
+            read_stream,
+            write_stream,
+            InitializationOptions(
+                server_name="crypto-mcp",
+                server_version="0.1.0",
+                capabilities=app.get_capabilities(
+                    notification_options=NotificationOptions(),
+                    experimental_capabilities={},
+                ),
+            ),
+        )
+
+
 if __name__ == "__main__":
     asyncio.run(main())
