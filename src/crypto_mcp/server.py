@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 
 from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
@@ -32,31 +33,31 @@ prompt_runners = {
 
 
 # List tools handler
-@app.list_tools()
+@app.list_tools()  # type: ignore[no-untyped-call,untyped-decorator]
 async def list_tools() -> list[Tool]:
     return tool_definitions
 
 
-@app.call_tool()
-async def call_tool(name: str, arguments: dict) -> list[TextContent]:
+@app.call_tool()  # type: ignore[untyped-decorator]
+async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     if name not in tool_runners:
         raise ValueError(f"Tool not found: {name}")
     return await tool_runners[name](arguments)
 
 
-@app.list_prompts()
+@app.list_prompts()  # type: ignore[no-untyped-call,untyped-decorator]
 async def list_prompts() -> list[Prompt]:
     return prompt_definitions
 
 
-@app.get_prompt()
-async def get_prompt(name: str, arguments: dict) -> GetPromptResult:
+@app.get_prompt()  # type: ignore[no-untyped-call,untyped-decorator]
+async def get_prompt(name: str, arguments: dict[str, Any]) -> GetPromptResult:
     if name not in prompt_runners:
         raise ValueError(f"Prompt not found: {name}")
     return prompt_runners[name](**arguments)
 
 
-async def main():
+async def main() -> None:
     async with stdio_server() as (read_stream, write_stream):
         await app.run(
             read_stream,

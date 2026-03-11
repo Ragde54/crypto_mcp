@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from mcp.types import TextContent, Tool
 
 from crypto_mcp.clients.coingecko import CoinGeckoClient
@@ -21,7 +23,7 @@ tool_definition = Tool(
 )
 
 
-async def run(arguments: dict) -> list[TextContent]:
+async def run(arguments: dict[str, Any]) -> list[TextContent]:
     currency = arguments.get("currency", "usd")
     top_n = arguments.get("top_n", 10)
     async with CoinGeckoClient() as client:

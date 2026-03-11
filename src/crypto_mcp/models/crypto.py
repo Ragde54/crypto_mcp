@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, cast
+
 from pydantic import BaseModel
 
 
@@ -10,10 +12,13 @@ class CoinPrice(BaseModel):
     change_24h: float | None
 
     @classmethod
-    def from_api_response(cls, data: dict[str, object], coin_id: str, currency: str) -> CoinPrice:
-        coin_data = data[coin_id]
+    def from_api_response(cls, data: dict[str, Any], coin_id: str, currency: str) -> CoinPrice:
+        coin_data: dict[str, Any] = data[coin_id]
         return cls(
-            coin_id=coin_id, currency=currency, price=coin_data[currency], change_24h=coin_data.get(f"{currency}_24h_change")
+            coin_id=coin_id,
+            currency=currency,
+            price=coin_data[currency],
+            change_24h=coin_data.get(f"{currency}_24h_change"),
         )
 
     def to_text(self) -> str:
@@ -33,14 +38,16 @@ class TrendingCoin(BaseModel):
     change_24h: float | None
 
     @classmethod
-    def from_api_response(cls, data: dict[str, object]) -> TrendingCoin:
-        item = data["item"]
+    def from_api_response(cls, data: dict[str, Any]) -> TrendingCoin:
+        item: dict[str, Any] = data["item"]
+        data_block: dict[str, Any] = item.get("data") or {}
+        pct_24h: dict[str, Any] = data_block.get("price_change_percentage_24h") or {}
         return cls(
             coin_id=item["id"],
             name=item["name"],
             symbol=item["symbol"],
             market_cap_rank=item.get("market_cap_rank"),
-            change_24h=item.get("data", {}).get("price_change_percentage_24h", {}).get("usd"),
+            change_24h=pct_24h.get("usd"),
         )
 
     def to_text(self) -> str:
@@ -63,14 +70,14 @@ class CoinMarket(BaseModel):
     change_24h: float | None
 
     @classmethod
-    def from_api_response(cls, data: dict[str, object]) -> CoinMarket:
+    def from_api_response(cls, data: dict[str, Any]) -> CoinMarket:
         return cls(
-            coin_id=data["id"],
-            name=data["name"],
-            symbol=data["symbol"],
-            current_price=data["current_price"],
-            market_cap=data.get("market_cap"),
-            change_24h=data.get("price_change_24h"),
+            coin_id=cast(str, data["id"]),
+            name=cast(str, data["name"]),
+            symbol=cast(str, data["symbol"]),
+            current_price=cast(float, data["current_price"]),
+            market_cap=cast("int | None", data.get("market_cap")),
+            change_24h=cast("float | None", data.get("price_change_24h")),
         )
 
     def to_text(self) -> str:

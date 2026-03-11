@@ -39,10 +39,7 @@ async def test_list_prompts():
 
 
 async def test_get_prompt(sample_coin_price):
-    result = await get_prompt(
-        "analyze-crypto",
-        {"coin_id": "bitcoin", "data": sample_coin_price.to_text()}
-    )
+    result = await get_prompt("analyze-crypto", {"coin_id": "bitcoin", "data": sample_coin_price.to_text()})
     assert len(result.messages) == 1
     assert "bitcoin" in result.messages[0].content.text.lower()
 

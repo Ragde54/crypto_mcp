@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from mcp.types import TextContent, Tool
 
 from crypto_mcp.clients.coingecko import CoinGeckoClient
@@ -22,7 +24,7 @@ tool_definition = Tool(
 )
 
 
-async def run(arguments: dict) -> list[TextContent]:
+async def run(arguments: dict[str, Any]) -> list[TextContent]:
     coin_id = arguments.get("coin_id")
     if not coin_id:
         raise ValueError("coin_id is required")

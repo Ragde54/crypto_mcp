@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from mcp.types import TextContent, Tool
 
 from crypto_mcp.clients.coingecko import CoinGeckoClient
@@ -14,7 +16,7 @@ tool_definition = Tool(
 )
 
 
-async def run(arguments: dict) -> list[TextContent]:
+async def run(arguments: dict[str, Any]) -> list[TextContent]:
     async with CoinGeckoClient() as client:
         trending = await client.get_trending()
     return [TextContent(type="text", text=coin.to_text()) for coin in trending]
